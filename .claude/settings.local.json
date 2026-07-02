@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/fill-lobby.js H3EEJ)",
+      "Bash(npm test *)"
+    ]
+  }
+}

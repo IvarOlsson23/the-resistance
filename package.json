@@ -1,0 +1,23 @@
+{
+  "name": "the-resistance-online",
+  "version": "1.0.0",
+  "description": "Spela brädspelet The Resistance online med vänner, i realtid, via webbläsaren.",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node scripts/test-rules.js && node scripts/simulate-game.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nanoid": "^5.0.7",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
+  }
+}
