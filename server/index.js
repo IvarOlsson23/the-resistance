@@ -61,8 +61,8 @@ io.on('connection', (socket) => {
   socket.on('joinLobby', ({ roomCode, name } = {}, cb) => {
     try {
       const game = rooms.getRoom(roomCode);
-      if (!game) throw new Error('Hittade ingen lobby med den koden.');
-      if (game.phase !== 'lobby') throw new Error('Spelet har redan startat i den lobbyn.');
+      if (!game) throw new Error("Couldn't find a lobby with that code.");
+      if (game.phase !== 'lobby') throw new Error('That lobby has already started its game.');
       const player = game.addPlayer(name, socket.id);
       socketMap.set(socket.id, { roomCode: game.roomCode, playerId: player.id });
       socket.join(game.roomCode);
@@ -76,9 +76,9 @@ io.on('connection', (socket) => {
   socket.on('rejoin', ({ roomCode, sessionToken } = {}, cb) => {
     try {
       const game = rooms.getRoom(roomCode);
-      if (!game) throw new Error('Lobbyn finns inte längre.');
+      if (!game) throw new Error("That lobby doesn't exist anymore.");
       const player = game.reconnectPlayer(sessionToken, socket.id);
-      if (!player) throw new Error('Kunde inte återansluta till spelet.');
+      if (!player) throw new Error('Could not reconnect to the game.');
       socketMap.set(socket.id, { roomCode: game.roomCode, playerId: player.id });
       socket.join(game.roomCode);
       cb?.({ ok: true, roomCode: game.roomCode, sessionToken: player.sessionToken, playerId: player.id });
@@ -96,9 +96,9 @@ io.on('connection', (socket) => {
     return (payload, cb) => {
       try {
         const ctx = socketMap.get(socket.id);
-        if (!ctx) throw new Error('Du är inte ansluten till någon lobby.');
+        if (!ctx) throw new Error("You're not connected to a lobby.");
         const game = rooms.getRoom(ctx.roomCode);
-        if (!game) throw new Error('Lobbyn finns inte längre.');
+        if (!game) throw new Error("That lobby doesn't exist anymore.");
         handler(game, ctx.playerId, payload || {}, cb);
       } catch (err) {
         if (cb) cb({ ok: false, message: err.message });
@@ -111,9 +111,9 @@ io.on('connection', (socket) => {
     'startGame',
     withGame((game, playerId, payload, cb) => {
       const player = game.getPlayer(playerId);
-      if (!player?.isHost) throw new Error('Bara värden kan starta spelet.');
-      if (game.playerCount < MIN_PLAYERS) throw new Error(`Ni behöver minst ${MIN_PLAYERS} spelare för att starta.`);
-      if (game.playerCount > MAX_PLAYERS) throw new Error(`Max ${MAX_PLAYERS} spelare tillåtna.`);
+      if (!player?.isHost) throw new Error('Only the host can start the game.');
+      if (game.playerCount < MIN_PLAYERS) throw new Error(`You need at least ${MIN_PLAYERS} players to start.`);
+      if (game.playerCount > MAX_PLAYERS) throw new Error(`Max ${MAX_PLAYERS} players allowed.`);
       game.startGame();
       cb?.({ ok: true });
       broadcastState(game);
@@ -133,7 +133,7 @@ io.on('connection', (socket) => {
     'removePlayer',
     withGame((game, playerId, { targetId } = {}, cb) => {
       const player = game.getPlayer(playerId);
-      if (!player?.isHost) throw new Error('Bara värden kan ta bort spelare.');
+      if (!player?.isHost) throw new Error('Only the host can remove players.');
       game.removePlayer(targetId);
       cb?.({ ok: true });
       broadcastState(game);

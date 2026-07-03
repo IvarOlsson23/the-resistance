@@ -46,7 +46,7 @@ function loadSession(roomCode) {
 
 function emitAsync(event, payload) {
   return new Promise((resolve) => {
-    socket.emit(event, payload, (res) => resolve(res || { ok: false, message: 'Inget svar från servern.' }));
+    socket.emit(event, payload, (res) => resolve(res || { ok: false, message: 'No response from the server.' }));
   });
 }
 
@@ -68,7 +68,7 @@ export const net = {
 
   async tryRejoin(roomCode) {
     const session = loadSession(roomCode);
-    if (!session) return { ok: false, message: 'Ingen sparad session.' };
+    if (!session) return { ok: false, message: 'No saved session.' };
     const res = await emitAsync('rejoin', { roomCode, sessionToken: session.sessionToken });
     if (res.ok) saveSession(res.roomCode, res.sessionToken, res.playerId);
     return res;

@@ -1,176 +1,177 @@
 # The Resistance — Online
 
-En webbversion av brädspelet **The Resistance** (grundspelet, 5–10 spelare) som ni
-kan spela ihop i realtid över internet — skapa en lobby, dela länken, och spela
-direkt i webbläsaren, även på mobilen.
+A web version of the board game **The Resistance** (base game, 5–10 players)
+that you can play together in real time over the internet — create a lobby,
+share the link, and play right in the browser, mobile included.
 
-Bygget är en enda Node.js-process: Express serverar frontend-filerna och
-Socket.io hanterar all realtidskommunikation. Allt spelstate hålls i serverns
-minne per lobby (ingen databas).
+The build is a single Node.js process: Express serves the frontend files and
+Socket.io handles all realtime communication. All game state lives in the
+server's memory per lobby (no database).
 
-## Innehåll
+## Contents
 
-- [Testa lokalt](#testa-lokalt)
-- [Deploya till Render (gratis, publik länk)](#deploya-till-render-gratis-publik-länk)
-- [Begränsningar med gratis-tier](#begränsningar-med-gratis-tier)
-- [Projektstruktur](#projektstruktur)
-- [Antaganden som gjorts](#antaganden-som-gjorts)
-- [Vidareutveckling](#vidareutveckling)
+- [Test locally](#test-locally)
+- [Deploy to Render (free, public link)](#deploy-to-render-free-public-link)
+- [Free-tier limitations](#free-tier-limitations)
+- [Project structure](#project-structure)
+- [Assumptions made](#assumptions-made)
+- [Extending the game](#extending-the-game)
 
-## Testa lokalt
+## Test locally
 
-Kräver [Node.js](https://nodejs.org) 18 eller senare.
+Requires [Node.js](https://nodejs.org) 18 or later.
 
 ```bash
 npm install
 npm start
 ```
 
-Öppna sedan `http://localhost:3000` i webbläsaren. Öppna gärna flera flikar
-(eller be en kompis på samma nätverk öppna din lokala IP) för att testa med
-flera spelare samtidigt.
+Then open `http://localhost:3000` in your browser. Feel free to open several
+tabs (or have a friend on the same network open your local IP) to test with
+multiple players at once.
 
-### Automatiska tester
+### Automated tests
 
-Två testskript finns för att verifiera spellogiken utan att behöva sitta med
-flera webbläsarflikar:
-
-```bash
-node scripts/test-rules.js       # Regelmotorn: uppdrag, röstning, vinstvillkor
-node scripts/simulate-game.js    # Fullständiga spel med 5/7/10 bottar + reconnect
-```
-
-Vill du manuellt klicka runt i UI:t men slippa öppna 5–10 flikar kan du starta
-servern (`npm start`), skapa en lobby i webbläsaren, och sedan i en annan
-terminal köra:
+Two test scripts verify the game logic without needing to sit with multiple
+browser tabs:
 
 ```bash
-node scripts/fill-lobby.js DIN-LOBBYKOD
+node scripts/test-rules.js       # Rules engine: missions, voting, win conditions
+node scripts/simulate-game.js    # Full games with 5/7/10 bots + reconnect
 ```
 
-Det fyller lobbyn med fyra robotspelare som auto-godkänner/spelar Framgång, så
-du kan se hela spelflödet i din egen webbläsare.
+If you want to manually click around the UI without opening 5–10 tabs, start
+the server (`npm start`), create a lobby in the browser, and then in another
+terminal run:
 
-## Deploya till Render (gratis, publik länk)
+```bash
+node scripts/fill-lobby.js YOUR-LOBBY-CODE
+```
 
-Render är valt eftersom det kan köra en enda Node-process med WebSockets utan
-extra konfiguration, och har en gratis nivå. Så här kopplar du ditt GitHub-repo
-till Render steg för steg:
+This fills the lobby with four bot players that auto-approve/play Success, so
+you can watch the whole game flow in your own browser.
 
-1. **Lägg upp koden på GitHub** (om det inte redan är gjort):
-   - Skapa ett nytt repo på [github.com/new](https://github.com/new).
-   - I mappen med projektet, kör:
+## Deploy to Render (free, public link)
+
+Render was chosen because it can run a single Node process with WebSockets
+with no extra configuration, and has a free tier. Here's how to connect your
+GitHub repo to Render step by step:
+
+1. **Put the code on GitHub** (if not already done):
+   - Create a new repo at [github.com/new](https://github.com/new).
+   - In the project folder, run:
      ```bash
      git init
      git add .
      git commit -m "Initial commit"
      git branch -M main
-     git remote add origin https://github.com/DITT-ANVÄNDARNAMN/DITT-REPO.git
+     git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
      git push -u origin main
      ```
 
-2. **Skapa ett konto på [render.com](https://render.com)** och logga in (går
-   bra att logga in direkt med ditt GitHub-konto).
+2. **Create an account at [render.com](https://render.com)** and log in
+   (signing in directly with your GitHub account works well).
 
-3. Klicka **New +** → **Blueprint** (Render läser då `render.yaml` som redan
-   finns i projektet och ställer in allt automatiskt). Om du inte ser
-   Blueprint-alternativet, välj istället **New +** → **Web Service**.
+3. Click **New +** → **Blueprint** (Render then reads the `render.yaml`
+   already in the project and sets everything up automatically). If you
+   don't see the Blueprint option, choose **New +** → **Web Service** instead.
 
-4. Välj ditt GitHub-repo. Render frågar om den får access till repot första
-   gången — godkänn det.
+4. Select your GitHub repo. Render will ask for access to the repo the first
+   time — approve it.
 
-5. Om du använde **Web Service** (inte Blueprint) istället, fyll i manuellt:
-   - **Name**: valfritt, t.ex. `the-resistance-online`
+5. If you used **Web Service** (not Blueprint) instead, fill in manually:
+   - **Name**: anything, e.g. `the-resistance-online`
    - **Runtime**: Node
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
    - **Instance Type**: Free
 
-6. Klicka **Create Web Service** (eller **Apply** om du använde Blueprint).
-   Render bygger och startar servern automatiskt — det tar ett par minuter
-   första gången.
+6. Click **Create Web Service** (or **Apply** if you used Blueprint). Render
+   builds and starts the server automatically — it takes a couple of minutes
+   the first time.
 
-7. När det är klart får du en publik URL, typ
-   `https://the-resistance-online.onrender.com`. Den är din permanenta
-   speladress — dela den (eller lobbylänkar som skapas utifrån den, se nedan)
-   med dina vänner.
+7. Once it's done you'll get a public URL, something like
+   `https://the-resistance-online.onrender.com`. That's your permanent game
+   address — share it (or lobby links built from it, see below) with your
+   friends.
 
-Varje gång du pushar nya ändringar till `main`-branchen på GitHub bygger och
-deployar Render om appen automatiskt.
+Every time you push new changes to the `main` branch on GitHub, Render
+automatically rebuilds and redeploys the app.
 
-## Begränsningar med gratis-tier
+## Free-tier limitations
 
-- **Servern somnar vid inaktivitet.** Render Free stänger ner tjänsten efter
-  ~15 minuter utan trafik. Nästa besökare får vänta 30–60 sekunder medan
-  servern startar om ("cold start"). Efter det är allt snabbt igen.
-- **Spelstate finns bara i minnet.** Om servern somnar eller startas om
-  (t.ex. vid en ny deploy) försvinner alla pågående lobbyer och spel. Se till
-  att inte deploya om medan ni har ett spel igång.
-- **En instans.** Free-planen kör bara en serverinstans, vilket är precis vad
-  vi vill här eftersom spelstate hålls i minnet (flera instanser skulle inte
-  dela state).
+- **The server falls asleep when idle.** Render Free spins the service down
+  after ~15 minutes without traffic. The next visitor has to wait 30–60
+  seconds while the server wakes up ("cold start"). After that, everything's
+  fast again.
+- **Game state only lives in memory.** If the server falls asleep or restarts
+  (e.g. on a new deploy), all in-progress lobbies and games disappear. Avoid
+  redeploying while a game is underway.
+- **Single instance.** The free plan only runs one server instance, which is
+  exactly what we want here since game state lives in memory (multiple
+  instances wouldn't share state).
 
-Om ni spelar ofta och cold starts känns jobbigt finns Renders betalda
-"Starter"-nivå som håller tjänsten varm, men det krävs inte för att spelet
-ska fungera.
+If you play often and cold starts get annoying, Render's paid "Starter" tier
+keeps the service warm, but it's not required for the game to work.
 
-## Projektstruktur
+## Project structure
 
 ```
 server/
-  index.js       Express + Socket.io-server, all socketkommunikation
-  game.js        Regelmotorn (Game-klassen) — all spellogik, testbar isolerat
-  rooms.js       Håller reda på alla aktiva lobbyer/rum i minnet
-  constants.js   Regeltabeller (antal spioner, teamstorlekar per spelarantal)
+  index.js       Express + Socket.io server, all socket communication
+  game.js        The rules engine (Game class) — all game logic, testable in isolation
+  rooms.js       Keeps track of all active lobbies/rooms in memory
+  constants.js   Rules tables (spy counts, team sizes per player count)
 public/
   index.html
-  css/style.css  Allt utseende — färgpalett, typsnitt, bordslayout, animationer
-  js/app.js      Klientlogik: routing mellan skärmar, rendering, interaktion
-  js/net.js      Socket.io-anslutning + session/reconnect via localStorage
-  js/svg.js      Alla handritade SVG-illustrationer (kortbaksidor, roller, ikoner)
+  css/style.css  All the visuals — color palette, fonts, table layout, animations
+  js/app.js      Client logic: routing between screens, rendering, interaction
+  js/net.js      Socket.io connection + session/reconnect via localStorage
+  js/svg.js      All hand-drawn SVG illustrations (card backs, roles, icons)
 scripts/
-  test-rules.js       Regelmotor-tester (ingen server behövs)
-  simulate-game.js    Fullständig spelsimulering över socket.io
-  fill-lobby.js       Manuellt testverktyg — fyller en riktig lobby med bottar
-render.yaml      Render-konfiguration
+  test-rules.js       Rules engine tests (no server needed)
+  simulate-game.js    Full game simulation over socket.io
+  fill-lobby.js       Manual test tool — fills a real lobby with bots
+render.yaml      Render configuration
 ```
 
-## Antaganden som gjorts
+## Assumptions made
 
-Kravspecen var ovanligt detaljerad, men några punkter krävde ett rimligt
-antagande:
+The spec was unusually detailed, but a few points called for a reasonable
+assumption:
 
-- **Röstningar är öppna precis som i det fysiska spelet** — alla ser hur alla
-  röstade efter att omröstningen är avslöjad (det är så originalspelet
-  fungerar; bara *uppdragskorten* är hemliga även efter avslöjande, då visas
-  bara antalet sabotage, inte vem som lade dem).
-- **Ledarens teamval är privat tills det bekräftas.** Andra spelare ser inte
-  vilka ledaren "provklickar på" innan hen skickar in det slutgiltiga
-  förslaget — bara det bekräftade laget visas för alla. Det matchar hur
-  klicket känns (fysiskt, inte ett formulär) utan att kräva att varje
-  mellanklick synkas över nätverket.
-- **Är värden borta ur lobbyn** (innan spelet startat) flyttas värdrollen
-  automatiskt till nästa anslutna spelare, så lobbyn aldrig fastnar utan
-  någon som kan starta spelet.
-- **Värden kan ta bort en frånkopplad spelare ur lobbyn** före start (inte
-  ett krav i specen, men användbart om någon aldrig kommer tillbaka och ni
-  behöver fylla platsen med någon annan).
-- **Rumskoder** är 5 tecken (utan lätt förväxlade tecken som 0/O eller 1/I).
+- **Votes are open, just like in the physical game** — everyone sees how
+  everyone voted once the vote is revealed (that's how the original game
+  works; only the *mission cards* stay secret even after being revealed,
+  showing just the sabotage count, not who played them).
+- **The leader's team picks are private until confirmed.** Other players
+  don't see who the leader is "trying out" before they submit the final
+  proposal — only the confirmed team is shown to everyone. That matches how
+  the click feels (physical, not a form) without needing every intermediate
+  click synced over the network.
+- **If the host leaves the lobby** (before the game starts), the host role
+  automatically moves to the next connected player, so the lobby never gets
+  stuck without anyone able to start the game.
+- **The host can remove a disconnected player** from the lobby before start
+  (not a spec requirement, but useful if someone never comes back and you
+  need to fill the seat with someone else).
+- **Room codes** are 5 characters (excluding easily-confused characters like
+  0/O or 1/I).
 
-## Vidareutveckling
+## Extending the game
 
-Kodstrukturen är medvetet uppdelad så att den ska vara enkel att bygga
-vidare på:
+The code is deliberately structured to be easy to build on:
 
-- **Nya roller (t.ex. Avalon-stil Merlin/Assassin)**: `server/game.js` har
-  redan en `roles`-Map (`playerId -> rollnamn`) och `privateRoleInfo()`
-  skickar bara det respektive spelare får se. Lägg till nya rollnamn i
-  `constants.js`, utöka rolltilldelningen i `startGame()`, och lägg till
-  motsvarande UI-logik (nya SVG-kort i `svg.js`, ny overlay-text i `app.js`).
-- **Fler samtidiga lobbyer** hanteras redan (varje lobby är en egen
-  `Game`-instans i minnet), så inga ändringar behövs där för att skala upp
-  antalet samtidiga bord.
-- Om spelstate behöver överleva omstarter i framtiden är `Game`s state redan
-  en enkel, serialiserbar structure (`toPublicState()` + de privata `roles`
-  och `sessionToken`-fälten) — att lägga till Redis eller en databas som
-  persistenslager kräver bara att byta ut `RoomManager` i `server/rooms.js`.
+- **New roles (e.g. Avalon-style Merlin/Assassin)**: `server/game.js` already
+  has a `roles` Map (`playerId -> role name`) and `privateRoleInfo()` only
+  sends each player what they're allowed to see. Add new role names in
+  `constants.js`, extend the role assignment in `startGame()`, and add the
+  matching UI logic (new SVG cards in `svg.js`, new overlay text in `app.js`).
+- **More concurrent lobbies** is already handled (each lobby is its own
+  `Game` instance in memory), so no changes are needed there to scale up the
+  number of simultaneous tables.
+- If game state needs to survive restarts in the future, `Game`'s state is
+  already a simple, serializable structure (`toPublicState()` plus the
+  private `roles` and `sessionToken` fields) — adding Redis or a database as
+  a persistence layer only requires swapping out `RoomManager` in
+  `server/rooms.js`.

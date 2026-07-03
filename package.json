@@ -1,7 +1,7 @@
 {
   "name": "the-resistance-online",
   "version": "1.0.0",
-  "description": "Spela brädspelet The Resistance online med vänner, i realtid, via webbläsaren.",
+  "description": "Play the board game The Resistance online with friends, in real time, in the browser.",
   "type": "module",
   "main": "server/index.js",
   "scripts": {

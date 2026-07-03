@@ -58,8 +58,8 @@ export class Game {
   }
 
   addPlayer(name, socketId) {
-    if (this.phase !== 'lobby') throw new Error('Spelet har redan startat.');
-    if (this.players.length >= MAX_PLAYERS) throw new Error('Lobbyn är full (max 10 spelare).');
+    if (this.phase !== 'lobby') throw new Error('The game has already started.');
+    if (this.players.length >= MAX_PLAYERS) throw new Error('The lobby is full (max 10 players).');
     const trimmed = (name || '').trim().slice(0, 20) || 'Spelare';
     const id = randomUUID();
     const sessionToken = randomUUID();
@@ -94,7 +94,7 @@ export class Game {
   }
 
   removePlayer(playerId) {
-    if (this.phase !== 'lobby') throw new Error('Kan bara ta bort spelare i lobbyn.');
+    if (this.phase !== 'lobby') throw new Error('Can only remove players while in the lobby.');
     const idx = this.players.findIndex((p) => p.id === playerId);
     if (idx === -1) return;
     const wasHost = this.players[idx].isHost;
@@ -107,7 +107,7 @@ export class Game {
   }
 
   startGame() {
-    if (!this.canStart()) throw new Error('Går inte att starta spelet just nu.');
+    if (!this.canStart()) throw new Error('Cannot start the game right now.');
     const n = this.playerCount;
     const spyCount = SPY_COUNTS[n];
     const shuffledIds = shuffle(this.players.map((p) => p.id));
@@ -140,13 +140,13 @@ export class Game {
   }
 
   proposeTeam(leaderId, playerIds) {
-    if (this.phase !== 'team-select') throw new Error('Fel fas för att välja team.');
-    if (this.leader.id !== leaderId) throw new Error('Bara ledaren kan välja team.');
+    if (this.phase !== 'team-select') throw new Error('Wrong phase for picking a team.');
+    if (this.leader.id !== leaderId) throw new Error('Only the leader can pick the team.');
     const required = this.requiredTeamSize();
     const unique = [...new Set(playerIds)];
-    if (unique.length !== required) throw new Error(`Teamet måste bestå av exakt ${required} spelare.`);
+    if (unique.length !== required) throw new Error(`The team must have exactly ${required} players.`);
     for (const id of unique) {
-      if (!this.getPlayer(id)) throw new Error('Ogiltig spelare i teamet.');
+      if (!this.getPlayer(id)) throw new Error('Invalid player in the team.');
     }
     this.currentTeam = unique;
     this.phase = 'voting';
@@ -154,8 +154,8 @@ export class Game {
   }
 
   castVote(playerId, approve) {
-    if (this.phase !== 'voting') throw new Error('Fel fas för att rösta.');
-    if (!this.getPlayer(playerId)) throw new Error('Okänd spelare.');
+    if (this.phase !== 'voting') throw new Error('Wrong phase for voting.');
+    if (!this.getPlayer(playerId)) throw new Error('Unknown player.');
     if (this.votes.has(playerId)) return { allVoted: this.votes.size === this.playerCount };
     this.votes.set(playerId, !!approve);
     const allVoted = this.votes.size === this.playerCount;
@@ -210,8 +210,8 @@ export class Game {
   }
 
   submitMissionCard(playerId, success) {
-    if (this.phase !== 'mission') throw new Error('Fel fas för uppdragskort.');
-    if (!this.isOnTeam(playerId)) throw new Error('Du är inte med i teamet för det här uppdraget.');
+    if (this.phase !== 'mission') throw new Error('Wrong phase for mission cards.');
+    if (!this.isOnTeam(playerId)) throw new Error("You're not on the team for this mission.");
     if (this.missionCards.has(playerId)) {
       return { allSubmitted: this.missionCards.size === this.currentTeam.length };
     }

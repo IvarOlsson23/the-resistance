@@ -61,10 +61,10 @@ net.on('connect', async () => {
 });
 
 net.on('disconnect', () => {
-  if (latestState) toast('Tappade anslutningen — försöker återansluta...');
+  if (latestState) toast('Lost connection — trying to reconnect...');
 });
 
-net.on('actionError', (err) => toast(err.message || 'Något gick fel.'));
+net.on('actionError', (err) => toast(err.message || 'Something went wrong.'));
 
 net.on('privateRole', (info) => {
   myRole = info;
@@ -97,21 +97,21 @@ function renderLanding() {
   appEl.innerHTML = `
     <div class="landing">
       <div class="landing__badge">${leaderBadgeSVG()}</div>
-      <h1 class="landing__title">Hemligt Uppdrag</h1>
-      <p class="landing__subtitle">The Resistance — samla ditt team, lita på varandra (eller inte), och avslöja spionerna innan det är för sent.</p>
+      <h1 class="landing__title">Classified Mission</h1>
+      <p class="landing__subtitle">The Resistance — assemble your team, trust each other (or don't), and root out the spies before it's too late.</p>
       <div class="action-stack">
         <button class="dossier-btn dossier-btn--primary" id="btnCreate">
           <span class="dossier-btn__icon">${shieldIconInline()}</span>
           <span class="dossier-btn__label">
-            <span class="dossier-btn__title">Skapa nytt uppdrag</span>
-            <span class="dossier-btn__hint">Bli värd och bjud in dina kontakter</span>
+            <span class="dossier-btn__title">Start New Mission</span>
+            <span class="dossier-btn__hint">Host the game and invite your friends</span>
           </span>
         </button>
         <button class="dossier-btn" id="btnJoin">
           <span class="dossier-btn__icon">${keyIconInline()}</span>
           <span class="dossier-btn__label">
-            <span class="dossier-btn__title">Gå med i uppdrag</span>
-            <span class="dossier-btn__hint">Du har fått en lobbykod</span>
+            <span class="dossier-btn__title">Join a Mission</span>
+            <span class="dossier-btn__hint">You've been given a lobby code</span>
           </span>
         </button>
       </div>
@@ -134,23 +134,23 @@ function renderNameForm({ mode, code = '', error = '' }) {
   appEl.innerHTML = `
     <div class="landing">
       <div class="landing__badge">${leaderBadgeSVG()}</div>
-      <h1 class="landing__title">${isJoin ? 'Gå med' : 'Skapa uppdrag'}</h1>
+      <h1 class="landing__title">${isJoin ? 'Join' : 'Create Mission'}</h1>
       <form class="field-card" id="entryForm">
         ${
           isJoin
             ? `<div>
-                <div class="field-card__label">Lobbykod</div>
-                <input class="name-input" id="codeInput" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="T.ex. AB3XK" value="${escapeHtml(code)}" />
+                <div class="field-card__label">Lobby code</div>
+                <input class="name-input" id="codeInput" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="e.g. AB3XK" value="${escapeHtml(code)}" />
               </div>`
             : ''
         }
         <div>
-          <div class="field-card__label">Ditt namn</div>
-          <input class="name-input" id="nameInput" maxlength="20" autocomplete="off" placeholder="Skriv ditt namn" value="${escapeHtml(myName)}" />
+          <div class="field-card__label">Your name</div>
+          <input class="name-input" id="nameInput" maxlength="20" autocomplete="off" placeholder="Enter your name" value="${escapeHtml(myName)}" />
         </div>
         ${error ? `<div class="error-text">${escapeHtml(error)}</div>` : ''}
-        <button class="btn btn--gold" type="submit">${isJoin ? 'Gå med i lobbyn' : 'Skapa lobby'}</button>
-        <button class="btn btn--ghost" type="button" id="btnBack">Tillbaka</button>
+        <button class="btn btn--gold" type="submit">${isJoin ? 'Join lobby' : 'Create lobby'}</button>
+        <button class="btn btn--ghost" type="button" id="btnBack">Back</button>
       </form>
     </div>
   `;
@@ -158,10 +158,10 @@ function renderNameForm({ mode, code = '', error = '' }) {
   document.getElementById('entryForm').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('nameInput').value.trim();
-    if (!name) return renderNameForm({ mode, code, error: 'Skriv ett namn först.' });
+    if (!name) return renderNameForm({ mode, code, error: 'Enter a name first.' });
     if (isJoin) {
       const roomCode = document.getElementById('codeInput').value.trim().toUpperCase();
-      if (!roomCode) return renderNameForm({ mode, code, error: 'Skriv in lobbykoden du fått.' });
+      if (!roomCode) return renderNameForm({ mode, code, error: 'Enter the lobby code you were given.' });
       const res = await net.joinLobby(roomCode, name);
       if (!res.ok) return renderNameForm({ mode, code: roomCode, error: res.message });
       myPlayerId = res.playerId;
@@ -181,16 +181,16 @@ function renderJoinWithCode(code) {
   appEl.innerHTML = `
     <div class="landing">
       <div class="landing__badge">${leaderBadgeSVG()}</div>
-      <h1 class="landing__title">Du är inbjuden</h1>
-      <p class="landing__subtitle">Lobbykod <strong>${escapeHtml(code)}</strong> — skriv ditt namn för att slå dig ner vid bordet.</p>
+      <h1 class="landing__title">You're Invited</h1>
+      <p class="landing__subtitle">Lobby code <strong>${escapeHtml(code)}</strong> — enter your name to take a seat at the table.</p>
       <form class="field-card" id="entryForm">
         <div>
-          <div class="field-card__label">Ditt namn</div>
-          <input class="name-input" id="nameInput" maxlength="20" autocomplete="off" placeholder="Skriv ditt namn" autofocus />
+          <div class="field-card__label">Your name</div>
+          <input class="name-input" id="nameInput" maxlength="20" autocomplete="off" placeholder="Enter your name" autofocus />
         </div>
         ${joinPrefillError ? `<div class="error-text">${escapeHtml(joinPrefillError)}</div>` : ''}
-        <button class="btn btn--gold" type="submit">Gå med i lobbyn</button>
-        <button class="btn btn--ghost" type="button" id="btnBack">Skriv annan kod</button>
+        <button class="btn btn--gold" type="submit">Join lobby</button>
+        <button class="btn btn--ghost" type="button" id="btnBack">Use a different code</button>
       </form>
     </div>
   `;
@@ -203,7 +203,7 @@ function renderJoinWithCode(code) {
     e.preventDefault();
     const name = document.getElementById('nameInput').value.trim();
     if (!name) {
-      joinPrefillError = 'Skriv ett namn först.';
+      joinPrefillError = 'Enter a name first.';
       return renderJoinWithCode(code);
     }
     const res = await net.joinLobby(code, name);
@@ -236,12 +236,12 @@ function renderLobbyWaiting(state) {
       seatSlots.push(`
         <div class="seat-slot seat-slot--filled ${p.isHost ? 'seat-slot--host' : ''} ${!p.connected ? 'seat-slot--disconnected' : ''}">
           <div class="avatar">${avatarSVG(p.name, 44)}</div>
-          <div class="seat-slot__name">${escapeHtml(p.name)}${p.id === myPlayerId ? ' (du)' : ''}</div>
-          ${!p.connected ? '<div class="seat-slot__name" style="color:var(--spy-soft);font-size:0.65rem;">frånkopplad</div>' : ''}
+          <div class="seat-slot__name">${escapeHtml(p.name)}${p.id === myPlayerId ? ' (you)' : ''}</div>
+          ${!p.connected ? '<div class="seat-slot__name" style="color:var(--spy-soft);font-size:0.65rem;">disconnected</div>' : ''}
         </div>
       `);
     } else {
-      seatSlots.push(`<div class="seat-slot seat-slot--empty">${i < state.minPlayers ? 'Väntar…' : 'Ledig plats'}</div>`);
+      seatSlots.push(`<div class="seat-slot seat-slot--empty">${i < state.minPlayers ? 'Waiting…' : 'Open seat'}</div>`);
     }
   }
 
@@ -249,25 +249,25 @@ function renderLobbyWaiting(state) {
 
   appEl.innerHTML = `
     <div class="lobby">
-      <h1 class="landing__title" style="font-size:1.5rem;">Väntrum</h1>
+      <h1 class="landing__title" style="font-size:1.5rem;">Waiting Room</h1>
       <div class="lobby__code-panel">
-        <div class="lobby__code-label">Lobbykod — dela med dina vänner</div>
+        <div class="lobby__code-label">Lobby code — share with your friends</div>
         <div class="lobby__code">${state.roomCode}</div>
         <div class="lobby__share-row">
           <input class="name-input" readonly id="shareUrl" value="${shareUrl}" style="flex:1;font-size:0.8rem;" />
-          <button class="btn btn--gold" id="btnCopy">Kopiera länk</button>
+          <button class="btn btn--gold" id="btnCopy">Copy link</button>
         </div>
       </div>
       <div class="lobby__seats">${seatSlots.join('')}</div>
       <div class="lobby__status">
-        ${state.players.length}/${state.maxPlayers} spelare anslutna (minst ${state.minPlayers} krävs för att starta)
+        ${state.players.length}/${state.maxPlayers} players connected (at least ${state.minPlayers} needed to start)
       </div>
       ${
         isHost
           ? `<button class="btn btn--gold" id="btnStart" style="max-width:360px;width:100%;" ${canStart ? '' : 'disabled'}>
-              ${canStart ? 'Starta uppdraget' : `Väntar på fler spelare…`}
+              ${canStart ? 'Start the mission' : `Waiting for more players…`}
             </button>`
-          : `<div class="waiting-note">Väntar på att värden ska starta spelet…</div>`
+          : `<div class="waiting-note">Waiting for the host to start the game…</div>`
       }
     </div>
   `;
@@ -275,10 +275,10 @@ function renderLobbyWaiting(state) {
   document.getElementById('btnCopy').onclick = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      toast('Länk kopierad!');
+      toast('Link copied!');
     } catch {
       document.getElementById('shareUrl').select();
-      toast('Markera och kopiera länken manuellt.');
+      toast('Select and copy the link manually.');
     }
   };
 
@@ -312,7 +312,7 @@ function mountGameView(state) {
   appEl.innerHTML = `
     <div class="game">
       <div class="topbar">
-        <div class="topbar__room">UPPDRAG · ${state.roomCode}</div>
+        <div class="topbar__room">MISSION · ${state.roomCode}</div>
         <div class="topbar__role-chip" id="roleChip"></div>
       </div>
       <div class="mission-track" id="missionTrack"></div>
@@ -356,7 +356,7 @@ function buildMissionTrack(state) {
     wrap.className = 'mission-slot';
     wrap.innerHTML = `
       <div class="mission-slot__disc" data-idx="${idx}"></div>
-      <div class="mission-slot__label">${m.teamSize} spelare${m.requiredFails === 2 ? ' · 2 sabotage' : ''}</div>
+      <div class="mission-slot__label">${m.teamSize} players${m.requiredFails === 2 ? ' · 2 fails' : ''}</div>
     `;
     gv.missionTrackEl.appendChild(wrap);
     return wrap.querySelector('.mission-slot__disc');
@@ -388,7 +388,7 @@ function buildSeats(state) {
         <div class="seat__card-inner">${cardBackSVG()}</div>
       </div>
       <div class="seat__name"><span class="leader-inline-badge">${leaderBadgeSVG()}</span>${escapeHtml(p.name)}</div>
-      ${p.id === myPlayerId ? '<div class="seat__you-tag">Du</div>' : ''}
+      ${p.id === myPlayerId ? '<div class="seat__you-tag">You</div>' : ''}
     `;
     gv.tableSurfaceEl.appendChild(root);
     gv.seatNodes.set(p.id, {
@@ -427,7 +427,7 @@ function updateRoleChip() {
   }
   const isSpy = myRole.role === 'spy';
   gv.roleChipEl.className = `topbar__role-chip ${isSpy ? 'topbar__role-chip--spy' : 'topbar__role-chip--resistance'}`;
-  gv.roleChipEl.textContent = isSpy ? 'Du är Spion' : 'Du är Motstånd';
+  gv.roleChipEl.textContent = isSpy ? 'You are a Spy' : 'You are Resistance';
 }
 
 function updateMissionTrack(state) {
@@ -445,24 +445,24 @@ function updateMissionTrack(state) {
 }
 
 const PHASE_COPY = {
-  'role-reveal': () => ['Roller delas ut', 'Titta i hemlighet på ditt kort...'],
+  'role-reveal': () => ['Roles are being dealt', 'Secretly look at your card...'],
   'team-select': (s) => {
     const leader = s.players.find((p) => p.id === s.leaderId);
     return [
-      `${leader ? leader.name : 'Ledaren'} väljer team`,
-      `Försök ${s.proposalNumber}/5 · Behöver ${s.missions[s.missionNumber - 1].teamSize} spelare för uppdrag ${s.missionNumber}`,
+      `${leader ? leader.name : 'The leader'} is choosing a team`,
+      `Attempt ${s.proposalNumber}/5 · Needs ${s.missions[s.missionNumber - 1].teamSize} players for mission ${s.missionNumber}`,
     ];
   },
   voting: (s) => [
-    'Omröstning pågår',
-    `${s.votedPlayerIds.length}/${s.players.length} har lagt sin röst`,
+    'Voting in progress',
+    `${s.votedPlayerIds.length}/${s.players.length} have cast their vote`,
   ],
   mission: (s) => [
-    `Uppdrag ${s.missionNumber} pågår`,
-    `${s.missionSubmittedIds.length}/${s.currentTeam.length} har spelat sitt kort`,
+    `Mission ${s.missionNumber} underway`,
+    `${s.missionSubmittedIds.length}/${s.currentTeam.length} have played their card`,
   ],
-  'mission-result': (s) => ['Uppdraget avslöjas...', ''],
-  'game-over': (s) => [s.winner === 'resistance' ? 'Motståndet vann' : 'Spionerna vann', ''],
+  'mission-result': (s) => ['The mission is being revealed...', ''],
+  'game-over': (s) => [s.winner === 'resistance' ? 'The Resistance won' : 'The Spies won', ''],
 };
 
 function updateStatusBanner(state) {
@@ -503,7 +503,7 @@ function toggleTeamPick(state, playerId) {
     gv.pendingTeam.splice(idx, 1);
   } else {
     if (gv.pendingTeam.length >= required) {
-      toast(`Teamet får bara bestå av ${required} spelare.`);
+      toast(`The team can only have ${required} players.`);
       return;
     }
     gv.pendingTeam.push(playerId);
@@ -531,35 +531,35 @@ function renderHandDock(state) {
     if (isLeaderMe) {
       const required = state.missions[state.missionNumber - 1].teamSize;
       dock.innerHTML = `
-        <div class="hand-dock__prompt">Peka ut ${required} spelare till uppdraget</div>
-        <div class="hand-dock__sub">${gv.pendingTeam.length}/${required} valda</div>
-        <button class="btn btn--gold" id="confirmTeam" ${gv.pendingTeam.length === required ? '' : 'disabled'}>Skicka ut teamet</button>
+        <div class="hand-dock__prompt">Point out ${required} players for the mission</div>
+        <div class="hand-dock__sub">${gv.pendingTeam.length}/${required} selected</div>
+        <button class="btn btn--gold" id="confirmTeam" ${gv.pendingTeam.length === required ? '' : 'disabled'}>Send out the team</button>
       `;
       document.getElementById('confirmTeam').onclick = async () => {
         const res = await net.proposeTeam(gv.pendingTeam);
         if (!res.ok) toast(res.message);
       };
     } else {
-      dock.innerHTML = `<div class="waiting-note">Ledaren väljer ut sitt team...</div>`;
+      dock.innerHTML = `<div class="waiting-note">The leader is choosing their team...</div>`;
     }
     return;
   }
 
   if (state.phase === 'voting') {
     if (state.votedPlayerIds.includes(myPlayerId)) {
-      dock.innerHTML = `<div class="waiting-note">Din röst är lagd. Väntar på de andra...</div>`;
+      dock.innerHTML = `<div class="waiting-note">Your vote is cast. Waiting for the others...</div>`;
       return;
     }
     dock.innerHTML = `
-      <div class="hand-dock__prompt">Godkänner du det föreslagna teamet?</div>
+      <div class="hand-dock__prompt">Do you approve the proposed team?</div>
       <div class="hand-row">
         <button class="choice-card choice-card--approve" id="voteApprove">
           ${approveIconSVG()}
-          <span class="choice-card__label">Godkänn</span>
+          <span class="choice-card__label">Approve</span>
         </button>
         <button class="choice-card choice-card--reject" id="voteReject">
           ${rejectIconSVG()}
-          <span class="choice-card__label">Avslå</span>
+          <span class="choice-card__label">Reject</span>
         </button>
       </div>
     `;
@@ -570,21 +570,21 @@ function renderHandDock(state) {
 
   if (state.phase === 'mission') {
     if (!onTeam) {
-      dock.innerHTML = `<div class="waiting-note">Du är inte med på det här uppdraget. Väntar på teamet...</div>`;
+      dock.innerHTML = `<div class="waiting-note">You're not on this mission. Waiting for the team...</div>`;
       return;
     }
     if (state.missionSubmittedIds.includes(myPlayerId)) {
-      dock.innerHTML = `<div class="waiting-note">Ditt kort är lagt. Väntar på resten av teamet...</div>`;
+      dock.innerHTML = `<div class="waiting-note">Your card is played. Waiting for the rest of the team...</div>`;
       return;
     }
     const isSpy = myRole?.role === 'spy';
     dock.innerHTML = `
-      <div class="hand-dock__prompt">Lägg ditt uppdragskort</div>
-      ${!isSpy ? '<div class="hand-dock__sub">Motståndet kan bara spela Framgång.</div>' : ''}
+      <div class="hand-dock__prompt">Play your mission card</div>
+      ${!isSpy ? '<div class="hand-dock__sub">Resistance members can only play Success.</div>' : ''}
       <div class="hand-row">
         <button class="choice-card choice-card--success" id="cardSuccess">
           ${successIconSVG()}
-          <span class="choice-card__label">Framgång</span>
+          <span class="choice-card__label">Success</span>
         </button>
         <button class="choice-card choice-card--fail" id="cardFail" ${isSpy ? '' : 'disabled'}>
           ${failIconSVG()}
@@ -644,15 +644,15 @@ function maybeShowRoleReveal() {
     : '';
 
   const overlay = showOverlay(`
-    <div class="overlay__title">Din hemliga roll</div>
+    <div class="overlay__title">Your Secret Role</div>
     <div class="flip-card flip-card--flipped" id="roleFlipCard">
       <div class="flip-card__inner">
         <div class="flip-card__face flip-card__face--front">${cardBackSVG()}</div>
         <div class="flip-card__face flip-card__face--back">${cardFront}</div>
       </div>
     </div>
-    ${isSpy ? `<div class="center-copy">Dina medspioner:</div>${spyList}` : '<div class="center-copy">Du vet inte vilka spionerna är. Var vaksam.</div>'}
-    <div class="center-copy">Spelet fortsätter automatiskt om några sekunder...</div>
+    ${isSpy ? `<div class="center-copy">Your fellow spies:</div>${spyList}` : "<div class=\"center-copy\">You don't know who the spies are. Stay alert.</div>"}
+    <div class="center-copy">The game continues automatically in a few seconds...</div>
   `);
   // Start face-down, then flip after a beat so it reads as "dealt then revealed".
   const flip = overlay.querySelector('#roleFlipCard');
@@ -693,12 +693,12 @@ function maybeShowVoteReveal(state) {
     .join('');
 
   const overlay = showOverlay(`
-    <div class="overlay__title">Omröstningen avslöjas</div>
+    <div class="overlay__title">The Vote is Revealed</div>
     <div class="result-verdict result-verdict--${reveal.approved ? 'approved' : 'rejected'}">
-      ${reveal.approved ? 'TEAMET GODKÄNT' : 'TEAMET AVSLÅGET'}
+      ${reveal.approved ? 'TEAM APPROVED' : 'TEAM REJECTED'}
     </div>
     <div class="vote-reveal-row">${chips}</div>
-    ${!reveal.approved ? '<div class="center-copy">Ledarskapet går vidare till nästa spelare...</div>' : '<div class="center-copy">Uppdraget inleds...</div>'}
+    ${!reveal.approved ? '<div class="center-copy">Leadership passes to the next player...</div>' : '<div class="center-copy">The mission begins...</div>'}
   `);
   setTimeout(() => overlay.remove(), 4200);
 }
@@ -720,12 +720,12 @@ function maybeShowMissionReveal(state) {
   });
 
   const overlay = showOverlay(`
-    <div class="overlay__title">Uppdrag ${reveal.missionNumber} avslöjas</div>
+    <div class="overlay__title">Mission ${reveal.missionNumber} Revealed</div>
     <div class="mission-reveal-cards">${cards.join('')}</div>
     <div class="result-verdict result-verdict--${reveal.result}">
-      ${reveal.result === 'success' ? 'UPPDRAGET LYCKADES' : 'UPPDRAGET MISSLYCKADES'}
+      ${reveal.result === 'success' ? 'MISSION SUCCEEDED' : 'MISSION FAILED'}
     </div>
-    <div class="center-copy">${reveal.failCount} sabotagekort spelades (av ${reveal.teamSize})</div>
+    <div class="center-copy">${reveal.failCount} sabotage card(s) played (out of ${reveal.teamSize})</div>
   `);
   setTimeout(() => overlay.remove(), 4800);
 }
@@ -741,7 +741,7 @@ function maybeShowGameOver(state) {
       <div class="gameover-roster__item gameover-roster__item--${p.role}">
         ${avatarSVG(p.name, 40)}
         <span>${escapeHtml(p.name)}</span>
-        <strong>${p.role === 'spy' ? 'Spion' : 'Motstånd'}</strong>
+        <strong>${p.role === 'spy' ? 'Spy' : 'Resistance'}</strong>
       </div>`
     )
     .join('');
@@ -749,19 +749,19 @@ function maybeShowGameOver(state) {
   const resistanceWon = state.winner === 'resistance';
   const reasonText =
     state.winReason === 'rejections'
-      ? 'Fem teamförslag i rad avslogs.'
+      ? 'Five team proposals in a row were rejected.'
       : resistanceWon
-      ? 'Motståndet klarade tre uppdrag.'
-      : 'Spionerna saboterade tre uppdrag.';
+      ? 'The Resistance completed three missions.'
+      : 'The Spies sabotaged three missions.';
 
   showOverlay(
     `
     <div class="winner-banner winner-banner--${resistanceWon ? 'resistance' : 'spy'}">
-      ${resistanceWon ? 'MOTSTÅNDET VINNER' : 'SPIONERNA VINNER'}
+      ${resistanceWon ? 'THE RESISTANCE WINS' : 'THE SPIES WIN'}
     </div>
     <div class="center-copy">${reasonText}</div>
     <div class="gameover-roster">${roster}</div>
-    <button class="btn btn--gold" id="btnNewGame">Till startsidan</button>
+    <button class="btn btn--gold" id="btnNewGame">Back to start</button>
   `,
     { dismissible: false }
   );

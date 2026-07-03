@@ -89,8 +89,8 @@ export function resistanceCardSVG() {
       <path d="M0 -46 L38 -31 C38 6 22 34 0 50 C-22 34 -38 6 -38 -31 Z" fill="#cfdbe8" opacity="0.9" />
       <path d="M0 -26 L8 -8 L28 -6 L13 8 L17 28 L0 17 L-17 28 L-13 8 L-28 -6 L-8 -8 Z" fill="#3a6ea5" />
     </g>
-    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">MOTSTÅND</text>
-    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Lojal mot uppdraget</text>
+    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">RESISTANCE</text>
+    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Loyal to the mission</text>
   </svg>`;
 }
 
@@ -112,8 +112,8 @@ export function spyCardSVG() {
       <rect x="-10" y="0" width="20" height="10" fill="#5c211d" />
       <rect x="-3" y="10" width="6" height="24" fill="#241d12" />
     </g>
-    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">SPION</text>
-    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Arbetar i det dolda</text>
+    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">SPY</text>
+    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Working in the shadows</text>
   </svg>`;
 }
 
