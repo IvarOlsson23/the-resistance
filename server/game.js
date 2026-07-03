@@ -43,6 +43,12 @@ export class Game {
     this.winReason = null;
     this.lastVoteReveal = null; // transient: { votes: {id: bool}, approved, proposalNumber }
     this.lastMissionReveal = null; // transient: { missionNumber, failCount, result }
+    this.log = []; // { id, at, text } — chronological, player-visible event log
+    this._logSeq = 0;
+  }
+
+  addLog(text) {
+    this.log.push({ id: ++this._logSeq, at: Date.now(), text });
   }
 
   get playerCount() {
@@ -122,6 +128,7 @@ export class Game {
     }));
     this.leaderIndex = Math.floor(Math.random() * n);
     this.phase = 'role-reveal';
+    this.addLog(`The mission begins. ${n} players, ${spyCount} of them Spies. Roles have been dealt in secret.`);
   }
 
   beginTeamSelect() {
@@ -151,13 +158,17 @@ export class Game {
     this.currentTeam = unique;
     this.phase = 'voting';
     this.votes.clear();
+    const names = unique.map((id) => this.getPlayer(id).name).join(', ');
+    this.addLog(`${this.getPlayer(leaderId).name} sent out a team for Mission ${this.missionNumber}: ${names}.`);
   }
 
   castVote(playerId, approve) {
     if (this.phase !== 'voting') throw new Error('Wrong phase for voting.');
-    if (!this.getPlayer(playerId)) throw new Error('Unknown player.');
+    const player = this.getPlayer(playerId);
+    if (!player) throw new Error('Unknown player.');
     if (this.votes.has(playerId)) return { allVoted: this.votes.size === this.playerCount };
     this.votes.set(playerId, !!approve);
+    this.addLog(`${player.name} cast their vote.`);
     const allVoted = this.votes.size === this.playerCount;
     return { allVoted };
   }
@@ -180,6 +191,7 @@ export class Game {
     };
 
     if (approved) {
+      this.addLog(`Team APPROVED for Mission ${this.missionNumber} (${approveCount} for, ${rejectCount} against).`);
       this.rejectionCount = 0;
       this.phase = 'mission';
       this.missionCards.clear();
@@ -188,9 +200,11 @@ export class Game {
 
     this.rejectionCount++;
     if (this.rejectionCount >= MAX_CONSECUTIVE_REJECTIONS) {
+      this.addLog(`Team REJECTED (${approveCount} for, ${rejectCount} against). Five proposals in a row have been rejected.`);
       this.winner = 'spies';
       this.winReason = 'rejections';
       this.phase = 'game-over';
+      this.addLog('GAME OVER — The Spies win! Five team proposals in a row were rejected.');
       return { approved, gameOver: true };
     }
 
@@ -198,6 +212,7 @@ export class Game {
     this.leaderIndex = (this.leaderIndex + 1) % this.playerCount;
     this.currentTeam = [];
     this.phase = 'team-select';
+    this.addLog(`Team REJECTED (${approveCount} for, ${rejectCount} against). Leadership passes to ${this.leader.name}.`);
     return { approved, gameOver: false };
   }
 
@@ -218,6 +233,7 @@ export class Game {
     const isResistance = this.roles.get(playerId) === 'resistance';
     const card = isResistance ? true : !!success; // resistance can only ever play success
     this.missionCards.set(playerId, card);
+    this.addLog(`${this.getPlayer(playerId).name} played their mission card.`);
     const allSubmitted = this.missionCards.size === this.currentTeam.length;
     return { allSubmitted };
   }
@@ -236,6 +252,9 @@ export class Game {
       teamSize: mission.teamSize,
     };
     this.phase = 'mission-result';
+    this.addLog(
+      `Mission ${this.missionNumber} ${failed ? 'FAILED' : 'SUCCEEDED'} (${failCount} sabotage card${failCount === 1 ? '' : 's'} out of ${mission.teamSize}).`
+    );
 
     const successes = this.missions.filter((m) => m.status === 'success').length;
     const fails = this.missions.filter((m) => m.status === 'fail').length;
@@ -243,9 +262,11 @@ export class Game {
     if (successes >= MISSIONS_TO_WIN) {
       this.winner = 'resistance';
       this.winReason = 'missions';
+      this.addLog(`GAME OVER — The Resistance wins! ${successes} missions succeeded.`);
     } else if (fails >= MISSIONS_TO_WIN) {
       this.winner = 'spies';
       this.winReason = 'missions';
+      this.addLog(`GAME OVER — The Spies win! ${fails} missions failed.`);
     }
     return { mission };
   }
@@ -316,6 +337,7 @@ export class Game {
       minPlayers: MIN_PLAYERS,
       maxPlayers: MAX_PLAYERS,
       spyCount: SPY_COUNTS[this.playerCount] || null,
+      log: this.log,
     };
   }
 

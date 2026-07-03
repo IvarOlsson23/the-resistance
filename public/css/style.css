@@ -4,13 +4,13 @@
    fittings, parchment dossiers. No cheerful board-game pastel.
    ========================================================================== */
 :root {
-  --felt-1: #123a2c;
-  --felt-2: #0b2e23;
-  --felt-3: #071f18;
-  --bg-app: #050f0c;
-  --panel: #12241c;
-  --panel-raised: #172c22;
-  --panel-border: #24402f;
+  --felt-1: #1a1a1a;
+  --felt-2: #111111;
+  --felt-3: #0a0a0a;
+  --bg-app: #0a0a0a;
+  --panel: #111111;
+  --panel-raised: #1a1a1a;
+  --panel-border: #2b2b2b;
 
   --parchment: #ede0c8;
   --parchment-dark: #d9c9a3;
@@ -31,15 +31,18 @@
   --gold-dim: #8a6f22;
   --gold-glow: rgba(201, 162, 39, 0.55);
 
-  --text: #f1ead9;
-  --text-muted: #a9b8ae;
-  --text-faint: #6f8478;
+  --white: #ffffff;
+  --white-dim: #e6e6e6;
+
+  --text: #f2f2f2;
+  --text-muted: #a3a3a3;
+  --text-faint: #707070;
 
   --danger: #b5453b;
   --success: #4f8f6a;
 
-  --font-display: 'Special Elite', 'Courier New', monospace;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --radius-card: 10px;
   --radius-panel: 16px;
@@ -59,7 +62,7 @@ body {
 }
 
 body {
-  background: radial-gradient(ellipse at 50% 0%, #0a1f18 0%, var(--bg-app) 70%);
+  background: radial-gradient(ellipse at 50% 0%, #161616 0%, var(--bg-app) 70%);
   color: var(--text);
   font-family: var(--font-body);
   overflow-x: hidden;
@@ -75,7 +78,8 @@ body {
 
 h1, h2, h3, .display {
   font-family: var(--font-display);
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   color: var(--text);
   margin: 0;
 }
@@ -140,10 +144,10 @@ button {
 /* A "dossier button" — looks like a stamped file card, not a form control. */
 .dossier-btn {
   position: relative;
-  background: linear-gradient(180deg, var(--panel-raised), var(--panel));
-  border: 1px solid var(--panel-border);
+  background: var(--white);
+  border: 1px solid var(--white);
   border-radius: var(--radius-panel);
-  color: var(--text);
+  color: var(--ink);
   padding: 18px 22px;
   font-size: 1rem;
   font-weight: 600;
@@ -151,13 +155,13 @@ button {
   display: flex;
   align-items: center;
   gap: 14px;
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--shadow-card);
 }
 
 .dossier-btn:hover {
   transform: translateY(-2px);
-  border-color: var(--gold-dim);
+  filter: brightness(0.97);
 }
 
 .dossier-btn:active {
@@ -165,8 +169,7 @@ button {
 }
 
 .dossier-btn--primary {
-  border-color: var(--gold-dim);
-  background: linear-gradient(180deg, #1c3527, var(--panel));
+  background: var(--white);
 }
 
 .dossier-btn__icon {
@@ -183,13 +186,14 @@ button {
 
 .dossier-btn__title {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1.05rem;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
 }
 
 .dossier-btn__hint {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--ink-soft);
 }
 
 .field-card {
@@ -249,30 +253,31 @@ button {
   transform: none;
 }
 
+/* Class name kept as -gold for now (primary action button); recolored white per current design pass. */
 .btn--gold {
-  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
-  color: #241a04;
+  background: var(--white);
+  color: var(--ink);
 }
 
 .btn--gold:not(:disabled):hover {
-  filter: brightness(1.08);
+  filter: brightness(0.95);
 }
 
 .btn--ghost {
   background: transparent;
-  border: 1px solid var(--panel-border);
-  color: var(--text-muted);
+  border: 1px solid var(--white-dim);
+  color: var(--white-dim);
 }
 
 .btn--ghost:hover {
-  border-color: var(--text-muted);
-  color: var(--text);
+  border-color: var(--white);
+  color: var(--white);
 }
 
 .btn--danger {
-  background: transparent;
-  border: 1px solid var(--spy);
-  color: var(--spy-soft);
+  background: var(--white);
+  border: 1px solid var(--white);
+  color: var(--spy);
 }
 
 .error-text {
@@ -459,7 +464,8 @@ button {
 
 .topbar__room {
   font-family: var(--font-display);
-  letter-spacing: 0.15em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
   font-size: 0.85rem;
 }
@@ -490,6 +496,7 @@ button {
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1rem;
   color: var(--text-muted);
   position: relative;
@@ -544,9 +551,10 @@ button {
 
 .status-banner__phase {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1.05rem;
   color: var(--gold-bright);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
 .status-banner__detail {
@@ -574,6 +582,149 @@ button {
 }
 
 /* ==========================================================================
+   Game shell — left info column (global status + event log) + right board
+   ========================================================================== */
+.game-shell {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-right: 1px solid var(--panel-border);
+  min-height: 0;
+}
+
+.status-panel {
+  flex: 0 0 33.333%;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.status-panel__header,
+.log-panel__header {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+}
+
+.status-panel__header {
+  margin-bottom: 6px;
+}
+
+.status-panel .mission-track {
+  padding: 0 0 10px;
+  background: none;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  gap: 6px;
+}
+
+.status-panel .mission-slot__disc {
+  width: clamp(24px, 6vw, 34px);
+  height: clamp(24px, 6vw, 34px);
+  font-size: 0.8rem;
+}
+
+.status-panel .mission-slot__label {
+  font-size: 0.56rem;
+}
+
+.status-panel .status-banner {
+  padding: 0;
+  text-align: left;
+}
+
+.status-panel .status-banner__phase {
+  font-size: 0.95rem;
+}
+
+.status-panel .rejection-track {
+  justify-content: flex-start;
+}
+
+.log-panel {
+  flex: 1 1 66.666%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.log-panel__header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--panel-border);
+  flex: 0 0 auto;
+}
+
+.log-panel__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-entry {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--text);
+  border-left: 2px solid var(--panel-border);
+  padding-left: 10px;
+  animation: seatArrive 0.25s ease;
+}
+
+.log-entry__time {
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  margin-right: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.board-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (min-width: 901px) {
+  .game-shell {
+    flex-direction: row;
+  }
+  .side-panel {
+    flex: 0 0 33.333%;
+    width: 33.333%;
+  }
+}
+
+@media (max-width: 900px) {
+  .game-shell {
+    flex-direction: column;
+  }
+  .side-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .board-panel {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+/* ==========================================================================
    The table
    ========================================================================== */
 .table-wrap {
@@ -592,7 +743,7 @@ button {
   aspect-ratio: 1 / 0.72;
   border-radius: 50% / 50%;
   background: radial-gradient(ellipse at 50% 40%, var(--felt-1), var(--felt-2) 60%, var(--felt-3) 100%);
-  border: 10px solid #08150f;
+  border: 10px solid #050505;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), var(--shadow-deep);
 }
 
@@ -763,6 +914,7 @@ button {
 
 .hand-dock__prompt {
   font-family: var(--font-display);
+  font-weight: 600;
   color: var(--text);
   font-size: 0.95rem;
   text-align: center;
@@ -819,7 +971,7 @@ button {
   width: 108px;
   height: 148px;
   border-radius: var(--radius-card);
-  background: linear-gradient(160deg, var(--parchment), var(--parchment-dark));
+  background: var(--white);
   color: var(--ink);
   border: none;
   display: flex;
@@ -862,6 +1014,7 @@ button {
 
 .choice-card__label {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1010,6 +1163,7 @@ button {
 
 .result-verdict {
   font-family: var(--font-display);
+  font-weight: 800;
   font-size: 1.5rem;
   padding: 6px 18px;
   border-radius: 8px;
@@ -1054,6 +1208,7 @@ button {
 
 .winner-banner {
   font-family: var(--font-display);
+  font-weight: 800;
   font-size: 1.8rem;
   text-align: center;
 }

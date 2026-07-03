@@ -44,7 +44,7 @@ export function avatarSVG(name, size = 44) {
     </defs>
     <circle cx="22" cy="22" r="22" fill="url(#${gid})" />
     <circle cx="22" cy="22" r="21" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
-    <text x="22" y="28" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="16" fill="#f1ead9">${escapeText(initials)}</text>
+    <text x="22" y="28" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="700" font-size="16" fill="#f1ead9">${escapeText(initials)}</text>
   </svg>`;
 }
 
@@ -61,8 +61,8 @@ export function cardBackSVG() {
   <svg viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
     <defs>
       <linearGradient id="backGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#1c3527" />
-        <stop offset="1" stop-color="#0b2018" />
+        <stop offset="0" stop-color="#1e1e1e" />
+        <stop offset="1" stop-color="#0a0a0a" />
       </linearGradient>
     </defs>
     <rect width="90" height="120" rx="8" fill="url(#backGrad)" />
@@ -89,8 +89,8 @@ export function resistanceCardSVG() {
       <path d="M0 -46 L38 -31 C38 6 22 34 0 50 C-22 34 -38 6 -38 -31 Z" fill="#cfdbe8" opacity="0.9" />
       <path d="M0 -26 L8 -8 L28 -6 L13 8 L17 28 L0 17 L-17 28 L-13 8 L-28 -6 L-8 -8 Z" fill="#3a6ea5" />
     </g>
-    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">RESISTANCE</text>
-    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Loyal to the mission</text>
+    <text x="100" y="216" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="20" fill="#241d12" letter-spacing="2">RESISTANCE</text>
+    <text x="100" y="236" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="11" fill="#4a3f2c">Loyal to the mission</text>
   </svg>`;
 }
 
@@ -112,8 +112,8 @@ export function spyCardSVG() {
       <rect x="-10" y="0" width="20" height="10" fill="#5c211d" />
       <rect x="-3" y="10" width="6" height="24" fill="#241d12" />
     </g>
-    <text x="100" y="216" text-anchor="middle" font-family="'Special Elite', monospace" font-size="20" fill="#241d12" letter-spacing="2">SPY</text>
-    <text x="100" y="236" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a3f2c">Working in the shadows</text>
+    <text x="100" y="216" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="20" fill="#241d12" letter-spacing="2">SPY</text>
+    <text x="100" y="236" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="11" fill="#4a3f2c">Working in the shadows</text>
   </svg>`;
 }
 

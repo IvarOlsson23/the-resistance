@@ -123,10 +123,10 @@ function renderLanding() {
 }
 
 function shieldIconInline() {
-  return `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 3l12 4.5v8c0 8-5.4 14-12 16.5C11.4 29.5 6 23.5 6 15.5v-8L18 3z" stroke="#e8c766" stroke-width="2"/></svg>`;
+  return `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 3l12 4.5v8c0 8-5.4 14-12 16.5C11.4 29.5 6 23.5 6 15.5v-8L18 3z" stroke="#241d12" stroke-width="2"/></svg>`;
 }
 function keyIconInline() {
-  return `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="13" cy="13" r="7" stroke="#e8c766" stroke-width="2"/><path d="M18 18l12 12M25 25l4-4M29 29l4-4" stroke="#e8c766" stroke-width="2" stroke-linecap="round"/></svg>`;
+  return `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="13" cy="13" r="7" stroke="#241d12" stroke-width="2"/><path d="M18 18l12 12M25 25l4-4M29 29l4-4" stroke="#241d12" stroke-width="2" stroke-linecap="round"/></svg>`;
 }
 
 function renderNameForm({ mode, code = '', error = '' }) {
@@ -305,6 +305,8 @@ const gv = {
   handDockEl: null,
   roleChipEl: null,
   tableSurfaceEl: null,
+  logListEl: null,
+  renderedLogCount: 0,
   pendingTeam: [],
 };
 
@@ -315,16 +317,29 @@ function mountGameView(state) {
         <div class="topbar__room">MISSION · ${state.roomCode}</div>
         <div class="topbar__role-chip" id="roleChip"></div>
       </div>
-      <div class="mission-track" id="missionTrack"></div>
-      <div class="status-banner" id="statusBanner">
-        <div class="status-banner__phase" id="statusPhase"></div>
-        <div class="status-banner__detail" id="statusDetail"></div>
-        <div class="rejection-track" id="rejectionTrack"></div>
+      <div class="game-shell">
+        <div class="side-panel">
+          <div class="status-panel" id="statusPanel">
+            <div class="status-panel__header">Mission Status</div>
+            <div class="mission-track" id="missionTrack"></div>
+            <div class="status-banner" id="statusBanner">
+              <div class="status-banner__phase" id="statusPhase"></div>
+              <div class="status-banner__detail" id="statusDetail"></div>
+              <div class="rejection-track" id="rejectionTrack"></div>
+            </div>
+          </div>
+          <div class="log-panel">
+            <div class="log-panel__header">Event Log</div>
+            <div class="log-panel__list" id="logList"></div>
+          </div>
+        </div>
+        <div class="board-panel">
+          <div class="table-wrap">
+            <div class="table-surface" id="tableSurface"></div>
+          </div>
+          <div class="hand-dock" id="handDock"></div>
+        </div>
       </div>
-      <div class="table-wrap">
-        <div class="table-surface" id="tableSurface"></div>
-      </div>
-      <div class="hand-dock" id="handDock"></div>
     </div>
   `;
   gv.roleChipEl = document.getElementById('roleChip');
@@ -334,6 +349,8 @@ function mountGameView(state) {
   gv.rejectionTrackEl = document.getElementById('rejectionTrack');
   gv.handDockEl = document.getElementById('handDock');
   gv.tableSurfaceEl = document.getElementById('tableSurface');
+  gv.logListEl = document.getElementById('logList');
+  gv.renderedLogCount = 0;
   gv.pendingTeam = [];
 
   buildMissionTrack(state);
@@ -342,6 +359,27 @@ function mountGameView(state) {
   window.addEventListener('resize', applyResponsiveMode);
 
   gameViewMounted = true;
+}
+
+function updateLog(state) {
+  const list = gv.logListEl;
+  if (!list || !state.log) return;
+  if (state.log.length < gv.renderedLogCount) gv.renderedLogCount = 0; // defensive, shouldn't happen
+  if (state.log.length === gv.renderedLogCount) return;
+
+  const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 40;
+  const fragment = document.createDocumentFragment();
+  for (let i = gv.renderedLogCount; i < state.log.length; i++) {
+    const entry = state.log[i];
+    const row = document.createElement('div');
+    row.className = 'log-entry';
+    const time = new Date(entry.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    row.innerHTML = `<span class="log-entry__time">${time}</span>${escapeHtml(entry.text)}`;
+    fragment.appendChild(row);
+  }
+  list.appendChild(fragment);
+  gv.renderedLogCount = state.log.length;
+  if (nearBottom) list.scrollTop = list.scrollHeight;
 }
 
 function applyResponsiveMode() {
@@ -413,6 +451,7 @@ function renderGame(state, previous) {
   updateSeats(state);
   updateLeaderBadge(state);
   renderHandDock(state);
+  updateLog(state);
 
   maybeShowRoleReveal();
   maybeShowVoteReveal(state);
