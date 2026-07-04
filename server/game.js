@@ -1,9 +1,10 @@
 import { randomUUID } from 'crypto';
 import {
   MIN_PLAYERS,
+  MIN_PLAYERS_TESTING,
   MAX_PLAYERS,
-  SPY_COUNTS,
-  TEAM_SIZES,
+  spyCountFor,
+  teamSizesFor,
   requiredFails,
   twoFailMissionIndex,
   MAX_CONSECUTIVE_REJECTIONS,
@@ -108,19 +109,27 @@ export class Game {
     if (wasHost && this.players.length > 0) this.players[0].isHost = true;
   }
 
-  canStart() {
-    return this.phase === 'lobby' && this.playerCount >= MIN_PLAYERS && this.playerCount <= MAX_PLAYERS;
+  // `force` bypasses MIN_PLAYERS down to MIN_PLAYERS_TESTING — a local
+  // prototyping shortcut, not part of the real rules (see spyCountFor /
+  // teamSizesFor for how sub-5-player games improvise role/team counts).
+  canStart(force = false) {
+    if (this.phase !== 'lobby' || this.playerCount > MAX_PLAYERS) return false;
+    return this.playerCount >= (force ? MIN_PLAYERS_TESTING : MIN_PLAYERS);
   }
 
-  startGame() {
-    if (!this.canStart()) throw new Error('Cannot start the game right now.');
+  startGame(force = false) {
+    if (!this.canStart(force)) {
+      if (this.playerCount > MAX_PLAYERS) throw new Error(`Max ${MAX_PLAYERS} players allowed.`);
+      const min = force ? MIN_PLAYERS_TESTING : MIN_PLAYERS;
+      throw new Error(`You need at least ${min} players to start.`);
+    }
     const n = this.playerCount;
-    const spyCount = SPY_COUNTS[n];
+    const spyCount = spyCountFor(n);
     const shuffledIds = shuffle(this.players.map((p) => p.id));
     shuffledIds.forEach((id, i) => {
       this.roles.set(id, i < spyCount ? 'spy' : 'resistance');
     });
-    this.missions = TEAM_SIZES[n].map((teamSize, idx) => ({
+    this.missions = teamSizesFor(n).map((teamSize, idx) => ({
       teamSize,
       requiredFails: requiredFails(n, idx),
       status: 'pending',
@@ -335,8 +344,9 @@ export class Game {
           ? this.players.map((p) => ({ id: p.id, name: p.name, role: this.roles.get(p.id) }))
           : null,
       minPlayers: MIN_PLAYERS,
+      minPlayersTesting: MIN_PLAYERS_TESTING,
       maxPlayers: MAX_PLAYERS,
-      spyCount: SPY_COUNTS[this.playerCount] || null,
+      spyCount: this.playerCount >= MIN_PLAYERS_TESTING ? spyCountFor(this.playerCount) : null,
       log: this.log,
     };
   }

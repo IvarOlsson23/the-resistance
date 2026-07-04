@@ -4,7 +4,6 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { RoomManager } from './rooms.js';
-import { MIN_PLAYERS, MAX_PLAYERS } from './constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
@@ -109,12 +108,10 @@ io.on('connection', (socket) => {
 
   socket.on(
     'startGame',
-    withGame((game, playerId, payload, cb) => {
+    withGame((game, playerId, { force } = {}, cb) => {
       const player = game.getPlayer(playerId);
       if (!player?.isHost) throw new Error('Only the host can start the game.');
-      if (game.playerCount < MIN_PLAYERS) throw new Error(`You need at least ${MIN_PLAYERS} players to start.`);
-      if (game.playerCount > MAX_PLAYERS) throw new Error(`Max ${MAX_PLAYERS} players allowed.`);
-      game.startGame();
+      game.startGame(!!force);
       cb?.({ ok: true });
       broadcastState(game);
       sendPrivateRoles(game);

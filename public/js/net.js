@@ -78,8 +78,8 @@ export const net = {
     return !!loadSession(roomCode);
   },
 
-  startGame() {
-    return emitAsync('startGame', {});
+  startGame(force = false) {
+    return emitAsync('startGame', { force });
   },
 
   removePlayer(targetId) {

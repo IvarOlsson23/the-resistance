@@ -38,3 +38,17 @@ export function twoFailMissionIndex(playerCount) {
 
 export const MAX_CONSECUTIVE_REJECTIONS = 5;
 export const MISSIONS_TO_WIN = 3;
+
+// Absolute floor for "Start anyway" — bypasses MIN_PLAYERS for local
+// prototyping only. Below 5 players there's no official rules table, so
+// spyCountFor/teamSizesFor below improvise something playable, not balanced.
+export const MIN_PLAYERS_TESTING = 2;
+
+export function spyCountFor(playerCount) {
+  return SPY_COUNTS[playerCount] ?? Math.max(1, Math.min(2, playerCount - 1));
+}
+
+export function teamSizesFor(playerCount) {
+  const base = TEAM_SIZES[playerCount] || TEAM_SIZES[5];
+  return base.map((size) => Math.max(1, Math.min(playerCount, size)));
+}

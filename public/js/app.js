@@ -246,6 +246,8 @@ function renderLobbyWaiting(state) {
   }
 
   const canStart = isHost && state.players.length >= state.minPlayers;
+  const minTesting = state.minPlayersTesting || 2;
+  const canForceStart = isHost && !canStart && state.players.length >= minTesting;
 
   appEl.innerHTML = `
     <div class="lobby">
@@ -266,7 +268,12 @@ function renderLobbyWaiting(state) {
         isHost
           ? `<button class="btn btn--gold" id="btnStart" style="max-width:360px;width:100%;" ${canStart ? '' : 'disabled'}>
               ${canStart ? 'Start the mission' : `Waiting for more players…`}
-            </button>`
+            </button>
+            ${
+              canForceStart
+                ? `<button class="btn btn--ghost" id="btnForceStart" style="max-width:360px;width:100%;">Start anyway (testing, skips the ${state.minPlayers}-player minimum)</button>`
+                : ''
+            }`
           : `<div class="waiting-note">Waiting for the host to start the game…</div>`
       }
     </div>
@@ -284,9 +291,16 @@ function renderLobbyWaiting(state) {
 
   if (isHost) {
     document.getElementById('btnStart').onclick = async () => {
-      const res = await net.startGame();
+      const res = await net.startGame(false);
       if (!res.ok) toast(res.message);
     };
+    const forceBtn = document.getElementById('btnForceStart');
+    if (forceBtn) {
+      forceBtn.onclick = async () => {
+        const res = await net.startGame(true);
+        if (!res.ok) toast(res.message);
+      };
+    }
   }
 }
 

@@ -157,6 +157,13 @@ assumption:
   need to fill the seat with someone else).
 - **Room codes** are 5 characters (excluding easily-confused characters like
   0/O or 1/I).
+- **"Start anyway" (testing only)**: the lobby's host sees a second button
+  once there are 2+ players, letting them start with fewer than the official
+  5-player minimum. Below 5 players there's no rules-table entry for spy
+  count or team sizes, so `spyCountFor`/`teamSizesFor` in
+  `server/constants.js` improvise something playable (not balanced) —
+  useful for quickly testing UI changes solo or with one other person,
+  not for real games.
 
 ## Extending the game
 

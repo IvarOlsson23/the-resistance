@@ -142,4 +142,41 @@ function playMissionRound(game, teamIdxs, cardsByIdx) {
   assert(result.mission.failCount === 0, 'resistance-only team cannot produce a fail card');
 }
 
+// --- "Start anyway" testing shortcut: normal start still enforces 5 --------
+{
+  const game = new Game('TEST');
+  for (let i = 0; i < 3; i++) game.addPlayer(`P${i}`, `sock${i}`);
+  assert(!game.canStart(false), 'cannot normal-start with only 3 players');
+  assert(game.canStart(true), 'can force-start with only 3 players');
+  let threw = false;
+  try {
+    game.startGame(false);
+  } catch {
+    threw = true;
+  }
+  assert(threw, 'startGame(false) should still reject below 5 players');
+  assert(game.phase === 'lobby', 'game should remain in lobby after rejected start');
+}
+
+// --- Force-start improvises playable spy/team counts below 5 players -------
+{
+  const game = new Game('TEST');
+  for (let i = 0; i < 3; i++) game.addPlayer(`P${i}`, `sock${i}`);
+  game.startGame(true);
+  assert(game.phase === 'role-reveal', 'force-started game should proceed to role-reveal');
+  const spies = game.players.filter((p) => game.roles.get(p.id) === 'spy');
+  assert(spies.length >= 1 && spies.length < 3, 'a 3-player force-start should have at least 1 spy and 1 resistance');
+  assert(game.missions.length === 5, 'still five missions even in a testing game');
+  assert(
+    game.missions.every((m) => m.teamSize >= 1 && m.teamSize <= 3),
+    'team sizes should be clamped to the available player count'
+  );
+}
+
+{
+  const game = new Game('TEST');
+  game.addPlayer('Solo', 'sock0');
+  assert(!game.canStart(true), 'force-start still refuses a single player');
+}
+
 console.log('\nALL RULE UNIT TESTS PASSED');
